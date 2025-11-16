@@ -16,6 +16,12 @@ import VolunteersList from './pages/VolunteersList';
 import RequestsList from './pages/RequestsList';
 import AssignVolunteer from './pages/AssignVolunteer';
 import MapView from './pages/MapView';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Unauthorized from './pages/Unauthorized';
+
+// Auth wrapper
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -25,16 +31,66 @@ function App() {
           <Navbar />
           <main className="flex-grow">
             <Routes>
+
+              {/* Public pages */}
               <Route path="/" element={<Home />} />
               <Route path="/donate" element={<Donate />} />
               <Route path="/volunteer" element={<Volunteer />} />
               <Route path="/request-help" element={<RequestHelp />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/dashboard/donations" element={<DonationsList />} />
-              <Route path="/dashboard/volunteers" element={<VolunteersList />} />
-              <Route path="/dashboard/requests" element={<RequestsList />} />
-              <Route path="/dashboard/assign" element={<AssignVolunteer />} />
               <Route path="/map" element={<MapView />} />
+
+              {/* Auth pages */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/unauthorized" element={<Unauthorized />} />
+
+              {/* Logged-in users only */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Admin-only pages */}
+              <Route
+                path="/dashboard/donations"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <DonationsList />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/dashboard/volunteers"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <VolunteersList />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/dashboard/requests"
+                element={
+                  <ProtectedRoute allowedRoles={['admin', 'volunteer']}>
+                    <RequestsList />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/dashboard/assign"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AssignVolunteer />
+                  </ProtectedRoute>
+                }
+              />
+
             </Routes>
           </main>
           <Footer />
@@ -57,4 +113,3 @@ function App() {
 }
 
 export default App;
-

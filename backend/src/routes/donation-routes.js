@@ -1,21 +1,19 @@
 const express = require('express');
 const donationController = require('../controllers/donation-controller');
+const { authMiddleware, authorize } = require('../middlewares/auth-middleware');
+
 
 const router = express.Router();
 
-// CREATE
-router.post('/', donationController.createDonation);
+router.post('/', authMiddleware, authorize(['donor', 'admin']), donationController.createDonation);
 
-// GET ALL
-router.get('/', donationController.getAllDonations);
+router.get('/', authMiddleware, authorize(['admin']), donationController.getAllDonations);
 
-// GET ONE
-router.get('/:id', donationController.getDonation);
+router.get('/:id', authMiddleware, authorize(['admin']), donationController.getDonation);
 
-// UPDATE
-router.put('/:id', donationController.updateDonation);
+router.put('/:id', authMiddleware, authorize(['admin']), donationController.updateDonation);
 
-// DELETE
-router.delete('/:id', donationController.deleteDonation);
+router.delete('/:id', authMiddleware, authorize(['admin']), donationController.deleteDonation);
+
 
 module.exports = router;

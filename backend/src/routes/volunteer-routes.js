@@ -1,21 +1,18 @@
 const express = require('express');
 const volunteerController = require('../controllers/volunteer-controller');
+const { authMiddleware, authorize } = require('../middlewares/auth-middleware');
 
 const router = express.Router();
 
-// CREATE volunteer
-router.post('/', volunteerController.createVolunteer);
+router.post('/', authMiddleware, authorize(['admin']), volunteerController.createVolunteer);
 
-// GET all volunteers
-router.get('/', volunteerController.getAllVolunteers);
+router.get('/', authMiddleware, authorize(['admin']), volunteerController.getAllVolunteers);
 
-// GET single volunteer
-router.get('/:id', volunteerController.getVolunteer);
+router.get('/:id', authMiddleware, authorize(['admin']), volunteerController.getVolunteer);
 
-// UPDATE volunteer
-router.put('/:id', volunteerController.updateVolunteer);
+router.put('/:id', authMiddleware, authorize(['admin']), volunteerController.updateVolunteer);
 
-// DELETE volunteer
-router.delete('/:id', volunteerController.deleteVolunteer);
+router.delete('/:id', authMiddleware, authorize(['admin']), volunteerController.deleteVolunteer);
+
 
 module.exports = router;

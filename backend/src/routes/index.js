@@ -5,6 +5,7 @@ const volunteerRoutes = require('./volunteer-routes');
 const resourceRequestRoutes = require('./request-routes');
 const adminStatsRoutes = require('./admin-stats-routes');
 const paymentRoutes = require('./payments-routes');
+const authRoutes = require('./auth-routes');
 const router = express.Router();
 
 
@@ -13,6 +14,8 @@ router.use('/donations', donationRoutes);
 router.use('/volunteers', volunteerRoutes);
 router.use('/requests', resourceRequestRoutes);
 router.use('/payments', paymentRoutes);
+router.use('/auth', authRoutes);
+
 
 
 module.exports = router;

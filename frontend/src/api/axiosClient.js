@@ -10,9 +10,18 @@ const axiosClient = axios.create({
   },
 });
 
-// Request interceptor
+/* -----------------------------
+   REQUEST INTERCEPTOR
+   (Attach JWT token automatically)
+-------------------------------- */
 axiosClient.interceptors.request.use(
   (config) => {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
     return config;
   },
   (error) => {
@@ -20,27 +29,47 @@ axiosClient.interceptors.request.use(
   }
 );
 
-// Response interceptor
+/* -----------------------------
+   RESPONSE INTERCEPTOR
+   (Handle 401 globally)
+-------------------------------- */
 axiosClient.interceptors.response.use(
   (response) => {
-    // Backend returns { success, message, data, error }
-    // Return the data property if it exists, otherwise return the full response
-    return response.data?.data !== undefined ? response.data.data : response.data;
+    return response.data?.data !== undefined
+      ? response.data.data
+      : response.data;
   },
   (error) => {
-    // Handle network errors
+    // If backend is offline
     if (!error.response) {
-      const message = 'Network Error: Unable to connect to the server. Please check if the backend is running.';
+      const message =
+        'Network Error: Unable to connect to the server. Please check if the backend is running.';
       toast.error(message);
-      console.error('Network Error:', error.message);
       return Promise.reject(new Error(message));
     }
-    
-    const message = error.response?.data?.message || error.message || 'Something went wrong';
+
+    // Handle unauthorized (expired or missing token)
+    if (error.response.status === 401) {
+      toast.error('Session expired. Please login again.');
+
+      // Clear invalid token
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+
+      // Redirect to login
+      window.location.href = '/login';
+      return Promise.reject(error);
+    }
+
+    const message =
+      error.response?.data?.error ||
+      error.response?.data?.message ||
+      error.message ||
+      'Something went wrong';
+
     toast.error(message);
     return Promise.reject(error);
   }
 );
 
 export default axiosClient;
-
